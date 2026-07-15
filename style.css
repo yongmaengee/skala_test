@@ -5,9 +5,19 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: Arial, "맑은 고딕", sans-serif;
-  background-color: #f3f4f6;
-  color: #222;
+  color: #3f3128;
+  background-color: #f7f4f1;
+  /* 메인윈도우 상단 기준 상위 20%만 파스텔 오렌지, 아래쪽은 부드럽게 페이드 */
+  background-image: linear-gradient(
+    to bottom,
+    #ffd9ae 0%,
+    #ffdfbb 65%,
+    rgba(255, 223, 187, 0) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 20vh;
 }
 
 /* 메인윈도우 + 좌우 서브윈도우를 나란히 배치 */
@@ -17,36 +27,56 @@ body {
   justify-content: center;
   gap: 20px;
   max-width: 1040px;
-  margin: 60px auto;
+  margin: 72px auto 60px;
   padding: 0 16px;
   flex-wrap: wrap;
 }
 
-/* 전체 앱 영역(메인윈도우) */
+/* 전체 앱 영역(메인윈도우) - 오렌지 밴드 위에 얹힌 느낌을 주기 위해 따뜻한 톤의 그림자 사용 */
 .container {
   flex: 1 1 420px;
   max-width: 600px;
   padding: 24px;
   background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(199, 122, 47, 0.16), 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* 보류/완료 서브윈도우 - 메인윈도우와 같은 흰 카드 스타일 */
 .side-window {
+  position: relative;
+  overflow: hidden;
   width: 220px;
   flex: 0 0 220px;
   background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(199, 122, 47, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
   padding: 20px;
+}
+
+/* 각 서브윈도우 성격에 맞는 스와이프 액션 색을 상단 바로 다시 한번 표시 */
+.side-window::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.side-window--hold::before {
+  background-color: #f59e0b;
+}
+
+.side-window--done::before {
+  background-color: #22c55e;
 }
 
 .side-window h2 {
   margin: 0 0 12px;
   text-align: center;
   font-size: 16px;
-  color: #555;
+  color: #6b5c4f;
 }
 
 .side-list {
@@ -88,11 +118,13 @@ body {
 h1 {
   margin: 0;
   text-align: center;
+  color: #4a3728;
+  letter-spacing: -0.02em;
 }
 
 .description {
   text-align: center;
-  color: #666;
+  color: #8a7b6f;
   font-size: 14px;
 }
 
