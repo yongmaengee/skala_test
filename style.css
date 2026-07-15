@@ -10,15 +10,79 @@ body {
   color: #222;
 }
 
-/* 전체 앱 영역 */
-.container {
-  width: 90%;
-  max-width: 600px;
+/* 메인윈도우 + 좌우 서브윈도우를 나란히 배치 */
+.app {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1040px;
   margin: 60px auto;
+  padding: 0 16px;
+  flex-wrap: wrap;
+}
+
+/* 전체 앱 영역(메인윈도우) */
+.container {
+  flex: 1 1 420px;
+  max-width: 600px;
   padding: 24px;
   background-color: white;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 보류/완료 서브윈도우 - 메인윈도우와 같은 흰 카드 스타일 */
+.side-window {
+  width: 220px;
+  flex: 0 0 220px;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+
+.side-window h2 {
+  margin: 0 0 12px;
+  text-align: center;
+  font-size: 16px;
+  color: #555;
+}
+
+.side-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.side-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  border: 1px solid #eee;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+/* 보류 항목은 위/아래로 끌어서 복귀시키는 대상이라는 것을 커서로 암시 */
+.side-window--hold .side-item {
+  cursor: ns-resize;
+  touch-action: pan-x; /* 세로 드래그는 JS가 처리, 가로 스크롤만 브라우저에 맡김 */
+}
+
+.side-window--done .side-item {
+  color: #999;
+  text-decoration: line-through;
+}
+
+.empty-hint {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: #aaa;
 }
 
 h1 {
@@ -29,77 +93,181 @@ h1 {
 .description {
   text-align: center;
   color: #666;
+  font-size: 14px;
 }
 
-/* 입력 폼 */
-.todo-form {
-  display: flex;
-  gap: 8px;
+/* ---------- 스와이프 공통 구조 ---------- */
+/* .swipe-row: 항목 하나(입력줄 또는 할일 항목)의 바깥 껍데기.
+   overflow:hidden으로 뒤에 숨겨둔 액션 버튼을 안쪽으로만 노출시킨다. */
+.swipe-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.input-row {
   margin-top: 24px;
 }
 
-.todo-form input {
-  flex: 1;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+.swipe-content {
+  position: relative;
+  z-index: 2;
+  background-color: #ffffff;
+  touch-action: pan-y; /* 세로 스크롤은 통과시키고 가로 드래그만 가로챈다 */
 }
 
-.todo-form button {
-  padding: 12px 16px;
+.input-row .swipe-content {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.input-row .swipe-content input {
+  width: 100%;
   border: none;
-  border-radius: 8px;
+  outline: none;
+  background: transparent;
+  padding: 12px;
+  font-size: 15px;
+}
+
+.todo-item .swipe-content {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+/* 뒤에 숨어있다가 드래그한 만큼 드러나는 액션 버튼 */
+.swipe-action {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
   color: white;
-  background-color: #2563eb;
+  font-weight: 600;
+  font-size: 14px;
+  opacity: 0;
+  user-select: none;
   cursor: pointer;
 }
 
-/* 할 일 목록 */
+.swipe-action.left-edge {
+  left: 0;
+}
+
+.swipe-action.right-edge {
+  right: 0;
+}
+
+.swipe-action[data-action="add"] { background-color: #2563eb; }
+.swipe-action[data-action="done"] { background-color: #22c55e; }
+.swipe-action[data-action="hold"] { background-color: #f59e0b; }
+
+/* ---------- 할 일 목록 ---------- */
 .todo-list {
   padding: 0;
   margin-top: 20px;
   list-style: none;
 }
 
-/* 할 일 1개 항목 */
-.todo-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-
-  margin-bottom: 10px;
-  padding: 12px;
-
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background-color: #ffffff;
+.todo-text {
+  position: relative;
+  display: inline-block;
 }
 
-/* 완료된 할 일 */
-.todo-item.done span {
-  color: #999;
-  text-decoration: line-through;
+/* 완료 스와이프 시 그려지는 취소선 */
+.todo-text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0%;
+  height: 2px;
+  background-color: currentColor;
+  transform: translateY(-50%);
 }
 
-/* 완료, 삭제 버튼 영역 */
-.todo-actions {
-  display: flex;
-  gap: 6px;
+.todo-item.strike .todo-text::after {
+  animation: strikeDraw 0.25s ease-out forwards;
 }
 
-.todo-actions button {
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+@keyframes strikeDraw {
+  to {
+    width: 100%;
+  }
 }
 
-.done-button {
-  background-color: #e5e7eb;
+/* 취소선이 그려진 뒤 깜빡이며 사라짐 */
+.todo-item.flicker-out {
+  animation: flickerOut 0.42s ease-in forwards;
 }
 
-.delete-button {
-  color: white;
-  background-color: #ef4444;
+@keyframes flickerOut {
+  0% { opacity: 1; }
+  15% { opacity: 0.15; }
+  30% { opacity: 1; }
+  45% { opacity: 0.1; }
+  60% { opacity: 0.85; }
+  100% { opacity: 0; transform: scale(0.92); }
+}
+
+/* 보류로 넘어갈 때의 옅어지는 신호 (완료와 구분되는 느낌) */
+.todo-item.to-hold {
+  transition: opacity 0.18s ease;
+  opacity: 0.35;
+}
+
+/* 새로 추가되거나 보류에서 복귀할 때: 관성이 살짝 붙은 "닦아내기" 팝업 */
+.todo-item.pop-in {
+  animation: addPop 0.5s cubic-bezier(0.22, 1.3, 0.36, 1) both;
+  transform-origin: bottom center;
+}
+
+@keyframes addPop {
+  0% { transform: translateY(26px) scaleY(0.55); opacity: 0; }
+  50% { transform: translateY(-8px) scaleY(1.08); opacity: 1; }
+  72% { transform: translateY(3px) scaleY(0.97); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+/* 서브윈도우에 새 항목이 들어올 때 살짝 페이드 */
+.side-item.enter {
+  animation: sideEnter 0.3s ease-out both;
+}
+
+@keyframes sideEnter {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 보류 항목을 위/아래로 밀어 복귀시킬 때의 쫀득한 젤리 바운스 */
+.side-item.restoring {
+  animation: jellyPop 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+  transform-origin: center;
+}
+
+@keyframes jellyPop {
+  0% { transform: scale(1); opacity: 1; }
+  30% { transform: scale(1.16, 0.86); }
+  55% { transform: scale(0.92, 1.1); }
+  78% { transform: scale(1.05, 0.97); }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* 좁은 화면에서는 서브윈도우를 메인윈도우 아래로 */
+@media (max-width: 900px) {
+  .app {
+    flex-direction: column;
+    align-items: center;
+  }
+  .side-window {
+    width: 100%;
+    max-width: 600px;
+  }
 }
