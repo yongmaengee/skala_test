@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TodoList 실습</title>
+
+  <!-- CSS 파일 연결 -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- JavaScript 파일 연결 -->
+  <script src="back.js" defer></script>
+</head>
+<body>
+  <div class="app">
+
+    <!-- 왼쪽 서브윈도우: 보류 목록 (아래/위로 스와이프하면 할일목록으로 복귀) -->
+    <aside class="side-window side-window--hold" id="holdWindow">
+      <h2>보류</h2>
+      <ul class="side-list" id="holdList"></ul>
+      <p class="empty-hint" id="holdEmptyHint">보류된 항목이 없습니다</p>
+    </aside>
+
+    <!-- 메인 윈도우 -->
+    <main class="container">
+      <h1>TodoList</h1>
+      <p class="description">할 일을 입력한 뒤, 오른쪽으로 밀면 추가 / 왼쪽으로 밀면 보류로 들어갑니다.</p>
+
+      <!-- 추가 버튼 대신 스와이프로 동작하는 입력줄 -->
+      <div class="swipe-row input-row" id="inputRow">
+        <div class="swipe-action left-edge" data-action="add">추가</div>
+        <div class="swipe-action right-edge" data-action="hold">보류</div>
+        <div class="swipe-content">
+          <input
+            type="text"
+            id="todoInput"
+            placeholder="할 일을 입력하세요"
+            autocomplete="off"
+          >
+        </div>
+      </div>
+
+      <!-- 할 일 목록: 각 항목도 오른쪽=완료 / 왼쪽=보류 스와이프 -->
+      <ul id="todoList" class="todo-list"></ul>
+    </main>
+
+    <!-- 오른쪽 서브윈도우: 완료 목록 -->
+    <aside class="side-window side-window--done" id="doneWindow">
+      <h2>완료</h2>
+      <ul class="side-list" id="doneList"></ul>
+      <p class="empty-hint" id="doneEmptyHint">완료된 항목이 없습니다</p>
+    </aside>
+
+  </div>
+</body>
+</html>
